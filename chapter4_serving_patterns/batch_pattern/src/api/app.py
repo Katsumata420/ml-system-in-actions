@@ -1,3 +1,4 @@
+import time
 from logging import getLogger
 
 from fastapi import FastAPI
@@ -8,7 +9,13 @@ from src.db.database import engine
 
 logger = getLogger(__name__)
 
-initialize.initialize_database(engine=engine, checkfirst=True)
+logger.info("Start initialize")
+try:
+    initialize.initialize_database(engine=engine, checkfirst=True)
+except Exception as e:
+    logger.info("Rise Error at initialize; Exit.")
+    print(e)
+    exit()
 
 app = FastAPI(
     title=APIConfigurations.title,

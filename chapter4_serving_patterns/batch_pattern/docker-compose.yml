@@ -18,6 +18,10 @@ services:
     hostname: mysql
     restart: always
     stdin_open: true
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "mysql", "-ppassword"]
+      timeout: 20s
+      retries: 10
 
   api:
     container_name: api
@@ -33,7 +37,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   job:
     container_name: job
@@ -47,4 +52,5 @@ services:
       - MYSQL_SERVER=mysql
     entrypoint: ["python", "-m", "src.task.job"]
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
